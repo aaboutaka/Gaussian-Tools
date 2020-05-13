@@ -17,7 +17,13 @@ import matplotlib
 from matplotlib import pyplot as plt
 import matplotlib.style as style
 import os
+import sys
 
+####
+if len(sys.argv) < 2 or  len(sys.argv) > 2 :
+    print('You need  two arguments: name of the file and the path to the folder')
+    sys.exit(0)
+####    
 ##################################################
 # This Function will grab the energy at each cycle
 ##################################################
@@ -157,11 +163,19 @@ def GrabRMSDP(directory):
 #### RUNNING THE FUCNTIONS
 #### REMEBER TO PROVIDE THE PATH IF THE CODE AND THE FILES ARE NOT IN THE SAME FOLDER
 ####
-GrabEnrg("SingleExcitations/C1Sym/CHFBrCl-GitHUB")
+#if len(sys.argv) < 2 or  len(sys.argv) > 2 :
+#    print('You need  two arguments: name of the file and the path to the folder')
+#    sys.exit(0)
+#elif len(sys.argv) == 2:
+
+GrabEnrg(sys.argv[1])
 #####
 
-GrabDIIS("SingleExcitations/C1Sym/CHFBrCl-GitHUB")
+GrabDIIS(sys.argv[1])
 #####
 
-GrabRMSDP("SingleExcitations/C1Sym/CHFBrCl-GitHUB")
+GrabRMSDP(sys.argv[1])
 ####
+
+
+
