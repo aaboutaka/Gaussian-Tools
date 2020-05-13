@@ -163,10 +163,6 @@ def GrabRMSDP(directory):
 #### RUNNING THE FUCNTIONS
 #### REMEBER TO PROVIDE THE PATH IF THE CODE AND THE FILES ARE NOT IN THE SAME FOLDER
 ####
-#if len(sys.argv) < 2 or  len(sys.argv) > 2 :
-#    print('You need  two arguments: name of the file and the path to the folder')
-#    sys.exit(0)
-#elif len(sys.argv) == 2:
 
 GrabEnrg(sys.argv[1])
 #####
