@@ -1,22 +1,22 @@
 #!/usr/bin/python
 # coding: utf-8
 
-
-
 # This program extract MO matrices from fchk or fmat files and calculate SVD
-
-
-
-
 import math
 import cmath
 import numpy as np
+np.set_printoptions(suppress=True)
 from numpy import array
 from numpy import diag
 from numpy import dot
 from numpy import zeros
-
-
+import sys
+##########
+if len(sys.argv) < 5 or  len(sys.argv) > 5 :
+    print('You need  5 arguments: name of the file, 1st filname, "1/-1 for Alpha or Beta' 
+           ', 2nd filename, and "1/-1 for Alpha or Beta"')
+    sys.exit(0)
+####                
 # This function will grab NBasis 
 def NBasGrab(filename):
     NBasis = 0
@@ -41,8 +41,7 @@ def NBasGrab(filename):
 
     return NBasis
 
-
-# This function will grab NBasis 
+# This function will grab the Alpha or Beta MO Matrix 
 def MatGrab(filename,switch):
 #   Get number of basis functions    
     NBasis=NBasGrab(filename)
@@ -198,54 +197,56 @@ def FrmAOOverlap(A):
     S = np.dot(np.transpose(CInv),CInv)
     return S
 
-
-AOOverlap=FrmAOOverlap(MatGrab("H2O.fmat",1))
-print(AOOverlap)
-
-
-AOOverlapfc=FrmAOOverlap(MatGrab("h2o.fchk",-1))
-print(AOOverlapfc)
-
-
-
 #######################
 #####Sanity Checks#####
 #######################
-MOCoeff =(MatGrab('H2O.fmat',1))
-MOCoeffT=np.transpose(MOCoeff)
-print ("MOCoeff")
-print (MOCoeff)
-print ("AO Overlap")
-print (AOOverlap)
-# You should get IDENTITY matrix 
-print ("CT.AOS.C")
-print((np.matmul(np.matmul((MOCoeffT),AOOverlapfc),MOCoeff)))
+#MOCoeff =(MatGrab('H2.fmat',1))
+#MOCoeffT=np.transpose(MOCoeff)
+#AOOverlap=FrmAOOverlap(MatGrab("H2O.fmat",1))
+#print ("MOCoeff")
+#print (MOCoeff)
+#print ("AO Overlap")
+#print (AOOverlap)
+## You should get IDENTITY matrix 
+#print ("CT.AOS.C")
+#print((np.matmul(np.matmul((MOCoeffT),AOOverlapfc),MOCoeff)))
 
 #########################################
 ######## EXAMPLE on H2 MOLECULE #########
 #########################################
 #
 # Pulling the Coeff. from the first file
-filename ='h2.fchk'
+filename =sys.argv[1]
+switch = int( sys.argv[2])
 # you can hhave different files, but they should have same dimensions
-filename2 = 'h2.fchk'
-switch = 1
-MOCoeff1 = MatGrab(filename,1)
+filename2 = sys.argv[3]
+switch2 =  int(sys.argv[4])
+
+MOCoeff1 = MatGrab(filename,switch)
 #
 # Pulling the Coeff. from the Second file
-MOCoeff2 = MatGrab(filename2,1)
+MOCoeff2 = MatGrab(filename2,switch2)
 #
 # Printing the coeff 
-print(" MOCoeff. of ",filename)
+print("###############################")
+print("### MO COEFF. OF",filename,"###")
+print("###############################")
+#print(" MOCoeff. of ",filename)
 print(MOCoeff1)
 print("")
-print(" MOCoeff. of ",filename2)
+# Printing the coeff
+print("###############################")
+print("### MO COEFF. OF",filename2,"###")
+print("###############################")
+#print(" MOCoeff. of ",filename2)
 print(MOCoeff2)
-
+print("")
 
 # Calculate the overlap between the two MOCoeffs. with and without the AO overlap
 MOOverlap  = np.matmul(np.transpose(MOCoeff1),MOCoeff2)
-MOOverlapS = np.matmul(np.matmul((MOCoeffT),AOOverlapfc),MOCoeff)
+
+AOOverlap=FrmAOOverlap(MatGrab(filename,switch))
+#MOOverlapS = np.matmul(np.matmul(np.transpose(MOCoeff1),AOOverlap),MOCoeff)
 #
 # Optional printing - uncomment it if needed
 # print" MO Overlap is ", MOOverlap
@@ -263,29 +264,44 @@ MOOverlapS = np.matmul(np.matmul((MOCoeffT),AOOverlapfc),MOCoeff)
 #      are returned in descending order.  The first min(m,n) columns of
 #      U and V are the left and right singular vectors of A.
 # SVD
-
+print("#########################################")
+print("###CALCULATING SVD USING MO-MO OVERLAP###")
+print("#########################################")
+print("")
 U, s, VT = np.linalg.svd(MOOverlap)
-print("U is ",(U))
-print("SIGMA is ",(s))
-print("V-Transpose is ",(VT))
-print("V is ",(np.transpose(VT)))
-
-
+print("######################")
+print("###### U MATRIX ######")
+print("######################")
+print(U)
+print("")
+print("#############################")
+print("### SIGMA DIAGONAL MATRIX ###")
+print("#############################")
+print(s)
+print("")
+print("##########################")
+print("### V-TRANSPOSE MATRIX ###")
+print("##########################")
+print(VT)
+print("")
+print("################")
+print("### V MATRIX ###")
+print("################")
+print(np.transpose(VT))
+print("")
 
 # We can also reconstruct the matrix using the diagonal matrix
 # First, form the diagonal matrix from s
 Sigma = diag(s)
-print("sigma" ,Sigma)
-
-
+#print("sigma" ,Sigma)
+#print("")
 
 # Reconstruct the initial matrix
 Reconstructed_MOOverlap = U.dot(Sigma.dot(VT))
 
-
-print("Reconstructed_AAOverlap", Reconstructed_MOOverlap)
-print(" ")
-print("MOOverlap is", MOOverlap)
+#print("Reconstructed_MOOverlap", Reconstructed_MOOverlap)
+#print(" ")
+#print("MOOverlap is", MOOverlap)
 
 
 
