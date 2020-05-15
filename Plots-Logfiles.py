@@ -19,6 +19,12 @@ import matplotlib.style as style
 import os
 import sys
 
+####
+if len(sys.argv) < 2 or  len(sys.argv) > 2 :
+    print('You need one more argument --> the path to the folder')
+    sys.exit(0)
+####
+
 ##################################################
 # This Function will grab the energy at each cycle
 ##################################################
