@@ -11,7 +11,7 @@ is a python program that plots the SCF, DIIS Error, and RMSPD versus number of S
 
 Example:
 
-$python "ExtractMOCoeff-AOOvlp.py" h2.fchk 1 h2.fchk 1
+$python3 "ExtractMOCoeff-AOOvlp.py" h2.fchk 1 h2.fchk 1
 
 - use flag 1 for alpha and flag -1 for beta
 - the above example performs SVD for an alpha-alpha overlap

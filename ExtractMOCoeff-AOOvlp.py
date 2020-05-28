@@ -26,16 +26,13 @@ def NBasGrab(filename):
                 if "NBasis" in line:
                     words = line.split()
                     for i in words:
-    #                     print (words[3])
                         NBasis = int(words[3])
         elif filename.endswith('.fchk'):
             for line in f:
                 if "Number of basis functions" in line:
                     words = line.split()
-                    for i in words:
-                        for letter in i:
-                            if(letter.isdigit()):
-                                NBasis = NBasis*10 + int(letter)
+                    NBasis = int(words[5])
+#            print (NBasis)                        
         else:
             print('The file extension is not supported. This script only supports fchk and fmat.')
 
@@ -52,8 +49,8 @@ def MatGrab(filename,switch):
 #           Initializing variables for fmat file    
             Exlines = int(math.ceil(NBasis/5))
             MOlines =int(Exlines+(NBasis*Exlines))
-            MOrawa=[]
-            MOrawb=[]
+            MOlista=[]
+            MOlistb=[]
             MOFull=[]
             MOA=[]
             MOB=[]            
@@ -64,27 +61,27 @@ def MatGrab(filename,switch):
                         for m in range(0,MOlines):
                             nextline = next(f)
                             nextline = nextline.split()
-                            MOrawa.append(nextline)       
+                            MOlista.append(nextline)       
 #                       Clean header rows and columns
-                        for n in range(0,len(MOrawa)-Exlines,NBasis):
-                            del MOrawa[n] 
-                        for n in range(len(MOrawa)):
-                            del MOrawa[n][0]
+                        for n in range(0,len(MOlista)-Exlines,NBasis):
+                            del MOlista[n] 
+                        for n in range(len(MOlista)):
+                            del MOlista[n][0]
 
 #                       For NBasis > 5, the matrix is stored in chunks. temp is equal to the number chunks.
-                        temp=int((len(MOrawa)/NBasis))
+                        temp=int((len(MOlista)/NBasis))
 #        
 #                       Create a copy of the first chunk of the matrix which is equal to NBasis.   
 #                       Start filling the empty list "MOFull"                    
                         for i in range(0,NBasis):
-                            MOFull.append(MOrawa[i])                            
+                            MOFull.append(MOlista[i])                            
 #                         
 #                       "Extend" the list "MOFull" by the chunks left to match the NBasis x NBasis matrix
                         for k in range(1,temp+1):
                             for j in range(0,NBasis):
-                                for i in range(len(MOrawa)):
+                                for i in range(len(MOlista)):
                                     if i==j+(NBasis*k):
-                                        MOFull[j].extend(MOrawa[i])                    
+                                        MOFull[j].extend(MOlista[i])                    
 #               Concatenate the list into one array    
                 ConcMOFull = np.array(np.concatenate([np.array(i) for i in MOFull]))
 #               Create another list to "float" all the elements 
@@ -102,26 +99,26 @@ def MatGrab(filename,switch):
                         for m in range(0,MOlines):
                             nextline = next(f)
                             nextline = nextline.split()
-                            MOrawb.append(nextline)     
+                            MOlistb.append(nextline)     
         #                   Clean header rows and columns                        
-                        for n in range(0,len(MOrawb)-Exlines,NBasis):
-                            del MOrawb[n] 
-                        for n in range(len(MOrawb)):
-                            del MOrawb[n][0]
+                        for n in range(0,len(MOlistb)-Exlines,NBasis):
+                            del MOlistb[n] 
+                        for n in range(len(MOlistb)):
+                            del MOlistb[n][0]
         #                   For NBasis > 5, the matrix is stored in chunks. temp is equal to the number chunks.
-                        temp=int((len(MOrawb)/NBasis))
+                        temp=int((len(MOlistb)/NBasis))
         #    
         #                   Create a copy of the first chunk of the matrix which is equal to NBasis.   
         #                   Start filling the empty list "MOFull"                    
                         for i in range(0,NBasis):
-                            MOFull.append(MOrawb[i])                            
+                            MOFull.append(MOlistb[i])                            
         #            
         #                   "Extend" the list "MOFull" by the chunks left to match the NBasis x NBasis matrix
                         for k in range(1,temp+1):
                             for j in range(0,NBasis):
-                                for i in range(len(MOrawb)):
+                                for i in range(len(MOlistb)):
                                     if i==j+(NBasis*k):
-                                        MOFull[j].extend(MOrawb[i])                    
+                                        MOFull[j].extend(MOlistb[i])                    
         #           Concatenate the list into one array    
                 ConcMOFull = np.array(np.concatenate([np.array(i) for i in MOFull]))
         #           Create another list to "float" all the elements 
@@ -135,59 +132,54 @@ def MatGrab(filename,switch):
 ######################################################################################################################
 #       FCHK FILES
         elif filename.endswith('.fchk'):
-#           Initializing variables for fchk file
             MOElements = NBasis * NBasis
             MOlines = int(MOElements/5) + 1
-            p = 0
-            r = 0
-            AOE = 0
-            MOrawa = np.zeros(NBasis*NBasis)
-            MOrawb = np.zeros(NBasis*NBasis)            
+            MOlista=[]
+            MOlistb=[]
+            MOA=[]
+            MOB=[]         
             if (NBasis%5 == 0):
                 MOlines = MOlines - 1
 #           Extract Alpha MO coefficient  
             if (switch == 1):
-                with open(filename,'r') as origin:
-                    for i, line  in enumerate(origin):
-                        if "Alpha Orbital Energies" in line:
-                            AOE = i
+                with open(filename,'r') as f:
+                    for line  in f:
                         if  "Alpha MO coefficients" in line:
-                            i=i+1
-                            AMO=i
-                            j=i+MOlines-1
-                            for m in range(0,j-i+1):
-                                nextline = next(origin)
+                            for m in range(0,MOlines):
+                                nextline = next(f)
                                 nextline = nextline.split()
-                                for p in range(p,len(nextline)):
-                                    MOrawa[r] = nextline[p]
-                                    r = r+1
-                                p = 0
-                # Reshape the array into NBasis by NBasis matrix                        
-                MOCoeffA = np.reshape(np.array(MOrawa),(NBasis,NBasis),order='F')
+#                                 print(nextline)
+                                MOlista.extend((nextline))
+#               Convert the items in the list to float
+                for i in MOlista:
+                    MOA.append(float(i))
+#                 print(MOA)
+#               Reshape the array into NBasis by NBasis matrix            
+                MOCoeffA = np.reshape(np.array(MOA),(NBasis,NBasis),order='F')
+#                 print(MOCoeffA)
+
                 return MOCoeffA
+#           Beta Case            
             if (switch == -1):
 #           Extract Beta MO coefficient                
-                with open(filename,'r') as origin:
-                    for i, line  in enumerate(origin):
-                        if "Beta Orbital Energies" in line:
-                                BOE = i
+                with open(filename,'r') as f:
+                    for line  in f:
                         if  "Beta MO coefficients" in line:
-                            i=i+1
-                            BMO=i
-                            j=i+MOlines-1
-                            for m in range(0,j-i+1):
-                                nextline = next(origin)
+                            for m in range(0,MOlines):
+                                nextline = next(f)
                                 nextline = nextline.split()
-                                for p in range(p,len(nextline)):
-                                    MOrawb[r] = nextline[p]
-                                    r = r+1
-                                p = 0
-#               Reshape the array into NBasis by NBasis matrix
-                MOCoeffB = np.reshape(np.array(MOrawb),(NBasis,NBasis),order='F')
+#                                 print(nextline)
+                                MOlistb.extend((nextline))
+                for i in MOlistb:
+                    MOB.append(float(i))
+#               Reshape the array into NBasis by NBasis matrix            
+                MOCoeffB = np.reshape(np.array(MOB),(NBasis,NBasis),order='F')
+
                 return MOCoeffB
+            
         else:
             print('The file extension is not supported. This script only supports fchk and fmat.')
-########################
+########################            
 
 #######################
 ##### AO OVERLAP ######
@@ -246,10 +238,11 @@ print("")
 MOOverlap  = np.matmul(np.transpose(MOCoeff1),MOCoeff2)
 
 AOOverlap=FrmAOOverlap(MatGrab(filename,switch))
+
 #MOOverlapS = np.matmul(np.matmul(np.transpose(MOCoeff1),AOOverlap),MOCoeff)
 #
 # Optional printing - uncomment it if needed
-# print" MO Overlap is ", MOOverlap
+#print(" MO Overlap is ", MOOverlap)
 
 ######################################
 ###########CALCULATING SVD############
